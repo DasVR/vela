@@ -2,6 +2,9 @@ const TILES = {
   "github.com": { label: "gh", bg: "#24292f", fg: "#ffffff" },
   "www.youtube.com": { label: "yt", bg: "#ff0033", fg: "#ffffff" },
   "duckduckgo.com": { label: "ddg", bg: "#de5833", fg: "#ffffff" },
+  "www.google.com": { label: "g", bg: "#ffffff", fg: "#14202b" },
+  "www.bing.com": { label: "b", bg: "#0f8f8f", fg: "#ffffff" },
+  "search.brave.com": { label: "br", bg: "#fb542b", fg: "#ffffff" },
   "news.ycombinator.com": { label: "hn", bg: "#ff6600", fg: "#ffffff" },
   "reddit.com": { label: "r", bg: "#ff4500", fg: "#ffffff" },
   "wikipedia.org": { label: "w", bg: "#f8fafc", fg: "#14202b" },
@@ -27,17 +30,35 @@ function tileFor(url) {
     return { label: "?", bg: "var(--raised)", fg: "var(--ink)" };
   }
 }
+const ENGINES = [
+  { id: "duckduckgo", name: "DuckDuckGo", pattern: "https://duckduckgo.com/?q=%s" },
+  { id: "google", name: "Google", pattern: "https://www.google.com/search?q=%s" },
+  { id: "bing", name: "Bing", pattern: "https://www.bing.com/search?q=%s" },
+  { id: "brave", name: "Brave", pattern: "https://search.brave.com/search?q=%s" },
+  { id: "startpage", name: "Startpage", pattern: "https://www.startpage.com/sp/search?query=%s" },
+  { id: "ecosia", name: "Ecosia", pattern: "https://www.ecosia.org/search?q=%s" },
+  { id: "mojeek", name: "Mojeek", pattern: "https://www.mojeek.com/search?q=%s" },
+  { id: "searx", name: "SearX", pattern: "https://searx.be/search?q=%s" }
+];
+function engineById(id) {
+  return ENGINES.find((e) => e.id === id) ?? ENGINES[0];
+}
+function searchUrlFor(query, engineId) {
+  return engineById(engineId).pattern.replace("%s", encodeURIComponent(query));
+}
 const QUICK_LINKS = [
   { url: "https://github.com", name: "GitHub" },
   { url: "https://www.youtube.com", name: "YouTube" },
-  { url: "https://duckduckgo.com", name: "DuckDuckGo" },
   { url: "https://news.ycombinator.com", name: "Hacker News" },
   { url: "https://www.wikipedia.org", name: "Wikipedia" },
   { url: "https://open.spotify.com", name: "Spotify" },
   { url: "https://chatgpt.com", name: "ChatGPT" },
-  { url: "https://claude.ai", name: "Claude" }
+  { url: "https://claude.ai", name: "Claude" },
+  { url: "https://www.bing.com", name: "Bing" }
 ];
 export {
   QUICK_LINKS as Q,
+  engineById as e,
+  searchUrlFor as s,
   tileFor as t
 };

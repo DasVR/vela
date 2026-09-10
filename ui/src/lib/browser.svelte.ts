@@ -2,6 +2,8 @@
 // The Rust side owns the real webviews; this mirrors their state and
 // sends commands back over Tauri IPC.
 
+import { searchUrlFor } from '$lib/sites';
+
 export type TabKind = 'start' | 'page';
 
 export interface Tab {
@@ -42,7 +44,7 @@ const tabs = $state<Tab[]>([]);
 let activeId = $state<string>('');
 let history = $state<HistoryEntry[]>([]);
 let bookmarks = $state<Bookmark[]>([]);
-const session = $state<{ theme: 'light' | 'dark' }>({ theme: 'light' });
+const session = $state<{ theme: 'light' | 'dark'; engine: string }>({ theme: 'light', engine: 'duckduckgo' });
 
 export const browser = {
   get tabs() { return tabs; },
@@ -58,6 +60,7 @@ export const browser = {
       history = s.history ?? [];
       bookmarks = s.bookmarks ?? [];
       session.theme = s.theme ?? 'light';
+      session.engine = s.engine ?? 'duckduckgo';
       const tabsIn = s.tabs ?? [];
       if (tabsIn.length) {
         for (const t of tabsIn) this.openTab(t.url || 'vela://start', t.id, { title: t.title, activate: t.id === s.activeId });
@@ -108,7 +111,7 @@ export const browser = {
   navigate(id: string, raw: string) {
     const tab = tabs.find((t) => t.id === id);
     if (!tab) return;
-    const url = normalizeUrl(raw);
+    const url = normalizeUrl(raw, session.engine);
     tab.url = url;
     tab.kind = url.startsWith('vela://') ? 'start' : 'page';
     tab.loading = tab.kind === 'page';
@@ -196,13 +199,18 @@ export const browser = {
     invokeSafe('set_theme', { theme });
   },
 
+  setEngine(engine: string) {
+    session.engine = engine;
+    invokeSafe('set_engine', { engine });
+  },
+
   clearHistory() {
     history = [];
     invokeSafe('clear_history', {});
   }
 };
 
-export function normalizeUrl(raw: string): string {
+export function normalizeUrl(raw: string, engine = 'duckduckgo'): string {
   const input = raw.trim();
   if (!input) return 'vela://start';
   if (input.startsWith('vela://')) return input;
@@ -217,7 +225,7 @@ export function normalizeUrl(raw: string): string {
     if (hasPort || input.startsWith('localhost')) return `http://${input}`;
     return `https://${input}`;
   }
-  return `https://duckduckgo.com/?q=${encodeURIComponent(input)}`;
+  return searchUrlFor(input, engine);
 }
 
 // invoke that tolerates running in a plain browser (vite dev / preview)

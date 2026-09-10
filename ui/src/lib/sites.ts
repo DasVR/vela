@@ -1,4 +1,5 @@
-// URL → monogram tile + favicon helpers, and the shield's cosmetic filter.
+// URL → monogram tile + favicon helpers, the shield's cosmetic filter,
+// and the search-engine registry.
 
 export interface TileInfo {
   label: string;   // 1–2 letter monogram
@@ -10,6 +11,9 @@ const TILES: Record<string, TileInfo> = {
   'github.com': { label: 'gh', bg: '#24292f', fg: '#ffffff' },
   'www.youtube.com': { label: 'yt', bg: '#ff0033', fg: '#ffffff' },
   'duckduckgo.com': { label: 'ddg', bg: '#de5833', fg: '#ffffff' },
+  'www.google.com': { label: 'g', bg: '#ffffff', fg: '#14202b' },
+  'www.bing.com': { label: 'b', bg: '#0f8f8f', fg: '#ffffff' },
+  'search.brave.com': { label: 'br', bg: '#fb542b', fg: '#ffffff' },
   'news.ycombinator.com': { label: 'hn', bg: '#ff6600', fg: '#ffffff' },
   'reddit.com': { label: 'r', bg: '#ff4500', fg: '#ffffff' },
   'wikipedia.org': { label: 'w', bg: '#f8fafc', fg: '#14202b' },
@@ -47,9 +51,39 @@ export function faviconFor(url: string): string | undefined {
   }
 }
 
+// ---- search engines ----------------------------------------------------------
+// The engine is user-selectable and persisted (kv "engine") — networks that
+// block one engine (schools commonly block DDG) get instant fallback.
+
+export interface Engine {
+  id: string;
+  name: string;
+  /** %s is replaced with the URL-encoded query */
+  pattern: string;
+}
+
+export const ENGINES: Engine[] = [
+  { id: 'duckduckgo', name: 'DuckDuckGo', pattern: 'https://duckduckgo.com/?q=%s' },
+  { id: 'google', name: 'Google', pattern: 'https://www.google.com/search?q=%s' },
+  { id: 'bing', name: 'Bing', pattern: 'https://www.bing.com/search?q=%s' },
+  { id: 'brave', name: 'Brave', pattern: 'https://search.brave.com/search?q=%s' },
+  { id: 'startpage', name: 'Startpage', pattern: 'https://www.startpage.com/sp/search?query=%s' },
+  { id: 'ecosia', name: 'Ecosia', pattern: 'https://www.ecosia.org/search?q=%s' },
+  { id: 'mojeek', name: 'Mojeek', pattern: 'https://www.mojeek.com/search?q=%s' },
+  { id: 'searx', name: 'SearX', pattern: 'https://searx.be/search?q=%s' }
+];
+
+export const DEFAULT_ENGINE = 'duckduckgo';
+
+export function engineById(id: string): Engine {
+  return ENGINES.find((e) => e.id === id) ?? ENGINES[0];
+}
+
+export function searchUrlFor(query: string, engineId: string): string {
+  return engineById(engineId).pattern.replace('%s', encodeURIComponent(query));
+}
+
 // ---- shield: cosmetic filter ------------------------------------------------
-// Injected by the Rust core at document-start in every page webview.
-// The network blocklist lives in Rust (src-tauri/src/shield.rs).
 
 export const COSMETIC_CSS = `
 a[href*="doubleclick.net"],
@@ -76,10 +110,10 @@ ins.adsbygoogle {
 export const QUICK_LINKS = [
   { url: 'https://github.com', name: 'GitHub' },
   { url: 'https://www.youtube.com', name: 'YouTube' },
-  { url: 'https://duckduckgo.com', name: 'DuckDuckGo' },
   { url: 'https://news.ycombinator.com', name: 'Hacker News' },
   { url: 'https://www.wikipedia.org', name: 'Wikipedia' },
   { url: 'https://open.spotify.com', name: 'Spotify' },
   { url: 'https://chatgpt.com', name: 'ChatGPT' },
-  { url: 'https://claude.ai', name: 'Claude' }
+  { url: 'https://claude.ai', name: 'Claude' },
+  { url: 'https://www.bing.com', name: 'Bing' }
 ];

@@ -1,6 +1,6 @@
 import "clsx";
 import { a6 as ssr_context, a7 as ensure_array_like, a8 as attr_class, a9 as attr, aa as attr_style, ab as stringify, e as escape_html, a5 as derived } from "../../chunks/index.js";
-import { t as tileFor } from "../../chunks/sites.js";
+import { s as searchUrlFor, t as tileFor, e as engineById } from "../../chunks/sites.js";
 function onDestroy(fn) {
   /** @type {SSRContext} */
   ssr_context.r.on_destroy(fn);
@@ -11,7 +11,7 @@ const tabs = [];
 let activeId = "";
 let history = [];
 let bookmarks = [];
-const session = { theme: "light" };
+const session = { theme: "light", engine: "duckduckgo" };
 const browser = {
   get tabs() {
     return tabs;
@@ -37,6 +37,7 @@ const browser = {
       history = s.history ?? [];
       bookmarks = s.bookmarks ?? [];
       session.theme = s.theme ?? "light";
+      session.engine = s.engine ?? "duckduckgo";
       const tabsIn = s.tabs ?? [];
       if (tabsIn.length) {
         for (const t of tabsIn) this.openTab(t.url || "vela://start", t.id, { title: t.title, activate: t.id === s.activeId });
@@ -83,7 +84,7 @@ const browser = {
   navigate(id, raw) {
     const tab = tabs.find((t) => t.id === id);
     if (!tab) return;
-    const url = normalizeUrl(raw);
+    const url = normalizeUrl(raw, session.engine);
     tab.url = url;
     tab.kind = url.startsWith("vela://") ? "start" : "page";
     tab.loading = tab.kind === "page";
@@ -166,12 +167,16 @@ const browser = {
     session.theme = theme;
     invokeSafe("set_theme", { theme });
   },
+  setEngine(engine) {
+    session.engine = engine;
+    invokeSafe("set_engine", { engine });
+  },
   clearHistory() {
     history = [];
     invokeSafe("clear_history", {});
   }
 };
-function normalizeUrl(raw) {
+function normalizeUrl(raw, engine = "duckduckgo") {
   const input = raw.trim();
   if (!input) return "vela://start";
   if (input.startsWith("vela://")) return input;
@@ -182,7 +187,7 @@ function normalizeUrl(raw) {
     if (hasPort || input.startsWith("localhost")) return `http://${input}`;
     return `https://${input}`;
   }
-  return `https://duckduckgo.com/?q=${encodeURIComponent(input)}`;
+  return searchUrlFor(input, engine);
 }
 let tauriInvoke;
 async function resolveInvoke() {
@@ -234,13 +239,14 @@ function Toolbar($$renderer, $$props) {
     });
     const active = derived(() => browser.active);
     const isStart = derived(() => !active() || active().kind === "start");
+    const engineName = derived(() => engineById(browser.session.engine).name);
     $$renderer2.push(`<div class="bar svelte-1ld6r3r"><button class="nav svelte-1ld6r3r"${attr("disabled", isStart(), true)} aria-label="Back" title="Back (Alt+←)">◀</button> <button class="nav svelte-1ld6r3r"${attr("disabled", isStart(), true)} aria-label="Forward" title="Forward (Alt+→)">▶</button> <button class="nav svelte-1ld6r3r"${attr("disabled", isStart(), true)} aria-label="Reload" title="Reload">⟳</button> <div${attr_class("omni svelte-1ld6r3r", void 0, { "editing": focused })}>`);
     if (active() && active().blocked > 0) {
       $$renderer2.push(`<!--[0--><span class="omni-shield mono svelte-1ld6r3r"${attr("title", `${stringify(active().blocked)} requests blocked by the shield on this tab`)}>⛨${escape_html(active().blocked)}</span>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <input${attr("value", draft)} placeholder="Search or enter address" spellcheck="false" class="svelte-1ld6r3r"/></div> <button${attr_class("nav star svelte-1ld6r3r", void 0, { "filled": browser.isBookmarked() })}${attr("disabled", isStart(), true)} aria-label="Bookmark this page" title="Bookmark">★</button> <button class="nav svelte-1ld6r3r" aria-label="Command palette" title="Command palette (Ctrl+K)"><span class="mono kbd svelte-1ld6r3r">Ctrl K</span></button> <button class="nav svelte-1ld6r3r" aria-label="Toggle theme" title="Toggle light/dark">${escape_html(browser.session.theme === "dark" ? "&#x263C;" : "&#x263D;")}</button> <span class="gap svelte-1ld6r3r"></span> `);
+    $$renderer2.push(`<!--]--> <input${attr("value", draft)} placeholder="Search or enter address" spellcheck="false" class="svelte-1ld6r3r"/></div> <button${attr_class("nav star svelte-1ld6r3r", void 0, { "filled": browser.isBookmarked() })}${attr("disabled", isStart(), true)} aria-label="Bookmark this page" title="Bookmark">★</button> <button class="nav svelte-1ld6r3r" aria-label="Command palette" title="Command palette (Ctrl+K)"><span class="mono kbd svelte-1ld6r3r">Ctrl K</span></button> <button class="nav engine-btn svelte-1ld6r3r"${attr("title", `Search engine: click to switch (currently ${stringify(engineName())})`)}><span class="mono kbd svelte-1ld6r3r">${escape_html(engineName())}</span></button> <button class="nav svelte-1ld6r3r" aria-label="Toggle theme" title="Toggle light/dark">${escape_html(browser.session.theme === "dark" ? "&#x263C;" : "&#x263D;")}</button> <span class="gap svelte-1ld6r3r"></span> `);
     if (document?.documentElement?.dataset?.platform !== "macos") {
       $$renderer2.push(`<!--[0--><button class="nav svelte-1ld6r3r" aria-label="Minimize">─</button> <button class="nav svelte-1ld6r3r" aria-label="Maximize">□</button> <button class="nav close svelte-1ld6r3r" aria-label="Close">✕</button>`);
     } else {

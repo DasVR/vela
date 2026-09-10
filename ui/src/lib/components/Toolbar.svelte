@@ -1,5 +1,6 @@
 <script lang="ts">
   import { browser, invokeSafe } from '$lib/browser.svelte';
+  import { ENGINES, engineById } from '$lib/sites';
 
   let draft = $state('');
   let focused = $state(false);
@@ -39,8 +40,10 @@
     else w.close();
   }
 
+
   const active = $derived(browser.active);
   const isStart = $derived(!active || active.kind === 'start');
+  const engineName = $derived(engineById(browser.session.engine).name);
 </script>
 
 <div class="bar">
@@ -98,6 +101,17 @@
     aria-label="Command palette"
     title="Command palette (Ctrl+K)"
   ><span class="mono kbd">Ctrl K</span></button>
+
+  <button
+    class="nav engine-btn"
+    onclick={() => {
+      const ids = ENGINES.map((e) => e.id);
+      const i = ids.indexOf(browser.session.engine);
+      browser.setEngine(ids[(i + 1) % ids.length]);
+    }}
+    title="Search engine: click to switch (currently {engineName})"
+  ><span class="mono kbd">{engineName}</span></button>
+
   <button
     class="nav"
     onclick={() => browser.setTheme(browser.session.theme === 'dark' ? 'light' : 'dark')}
@@ -192,4 +206,13 @@
   .gap { flex: 1; }
 
   .close:hover { background: var(--warn); color: #fff; }
+
+  .engine-btn {
+    width: auto;
+    padding: 0 10px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .engine-btn:hover { color: var(--ink); background: var(--raised); }
 </style>

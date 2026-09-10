@@ -3,12 +3,13 @@
   // "start" tab. Knows its own webview label so it can tell the Rust
   // core to navigate THIS tab.
   import { onMount } from 'svelte';
-  import { tileFor, QUICK_LINKS } from '$lib/sites';
+  import { tileFor, QUICK_LINKS, searchUrlFor } from '$lib/sites';
 
   let now = $state(new Date());
   let recents = $state<{ url: string; title: string }[]>([]);
   let bookmarks = $state<{ url: string; title: string }[]>([]);
   let theme = $state<'light' | 'dark'>('light');
+  let engine = $state('duckduckgo');
   let query = $state('');
   let me: string | undefined;
 
@@ -31,7 +32,7 @@
       ? input.replace(/^https?:\/\//i, '').startsWith('localhost')
         ? `http://${input}`
         : `https://${input.replace(/^https?:\/\//i, '')}`
-      : `https://duckduckgo.com/?q=${encodeURIComponent(input)}`;
+      : searchUrlFor(input, engine);
     const { invoke } = await import('@tauri-apps/api/core');
     await invoke('load_in_tab', { id: me, url });
   }
@@ -44,6 +45,7 @@
       const { invoke } = await import('@tauri-apps/api/core');
       const s = await invoke<any>('start_state');
       theme = s.theme ?? 'light';
+      engine = s.engine ?? 'duckduckgo';
       recents = s.recents ?? [];
       bookmarks = s.bookmarks ?? [];
     } catch {

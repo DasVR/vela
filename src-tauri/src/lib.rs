@@ -46,6 +46,7 @@ fn empty_session() -> store::SessionState {
         tabs: vec![],
         active_id: None,
         theme: "light".into(),
+        engine: "duckduckgo".into(),
     }
 }
 
@@ -173,6 +174,7 @@ struct StartState {
     recents: Vec<store::HistoryEntry>,
     bookmarks: Vec<store::Bookmark>,
     theme: String,
+    engine: String,
 }
 
 #[tauri::command]
@@ -182,6 +184,7 @@ fn start_state(app: tauri::AppHandle, wv: Webview) -> StartState {
             recents: vec![],
             bookmarks: vec![],
             theme: "light".into(),
+            engine: "duckduckgo".into(),
         };
     }
     let s = app.state::<Arc<store::Store>>().restore_session();
@@ -189,6 +192,7 @@ fn start_state(app: tauri::AppHandle, wv: Webview) -> StartState {
         recents: s.history.into_iter().take(8).collect(),
         bookmarks: s.bookmarks,
         theme: s.theme,
+        engine: s.engine,
     }
 }
 
@@ -233,6 +237,14 @@ fn set_theme(app: tauri::AppHandle, wv: Webview, theme: String) {
         return;
     }
     app.state::<Arc<store::Store>>().set_kv("theme", &theme);
+}
+
+#[tauri::command]
+fn set_engine(app: tauri::AppHandle, wv: Webview, engine: String) {
+    if !caller_is_chrome(&wv) {
+        return;
+    }
+    app.state::<Arc<store::Store>>().set_kv("engine", &engine);
 }
 
 // ----- poller: mirror tab state into the strip + persist ---------------------
@@ -328,6 +340,7 @@ pub fn run() {
             remove_bookmark,
             clear_history,
             set_theme,
+            set_engine,
             palette::open_palette,
             palette::close_palette
         ])

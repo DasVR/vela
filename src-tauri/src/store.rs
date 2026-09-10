@@ -37,6 +37,7 @@ pub struct SessionState {
     #[serde(rename = "activeId")]
     pub active_id: Option<String>,
     pub theme: String,
+    pub engine: String,
 }
 
 pub struct Store {
@@ -180,6 +181,7 @@ impl Store {
                 Some(active_raw)
             },
             theme: self.get_kv("theme").unwrap_or_else(|| "light".into()),
+            engine: self.get_kv("engine").unwrap_or_else(|| "duckduckgo".into()),
         }
     }
 }
