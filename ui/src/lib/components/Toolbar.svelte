@@ -159,6 +159,17 @@
     border: 1px solid var(--hairline);
     transition: border-color 120ms ease, box-shadow 120ms ease;
   }
+  /* macOS: the omnibox is the hero glass capsule */
+  :global(html[data-platform='macos']) .omni {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(26px) saturate(1.7);
+    -webkit-backdrop-filter: blur(26px) saturate(1.7);
+    border: 0.5px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.18),
+      0 2px 12px rgba(20, 32, 43, 0.06);
+  }
   .omni.editing {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-soft);

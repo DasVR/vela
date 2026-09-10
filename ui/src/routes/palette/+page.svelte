@@ -122,6 +122,23 @@
     box-shadow: var(--shadow);
   }
 
+  /* macOS: palette floats as a glass panel over the page */
+  :global(html[data-platform='macos']) .pal {
+    background: rgba(248, 250, 252, 0.6);
+    backdrop-filter: blur(28px) saturate(1.8);
+    -webkit-backdrop-filter: blur(28px) saturate(1.8);
+    border: 0.5px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      0 12px 40px rgba(20, 32, 43, 0.18);
+  }
+  :global(html[data-theme='dark'][data-platform='macos']) .pal {
+    background: rgba(18, 27, 35, 0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+
   input {
     height: 46px;
     padding: 0 16px;

@@ -1,6 +1,6 @@
 {
   ".svelte-kit/generated/client-optimized/app.js": {
-    "file": "_app/immutable/entry/app.BdeS9EYJ.js",
+    "file": "_app/immutable/entry/app.45UweVeG.js",
     "name": "entry/app",
     "src": ".svelte-kit/generated/client-optimized/app.js",
     "isEntry": true,
@@ -24,7 +24,7 @@
     ]
   },
   ".svelte-kit/generated/client-optimized/nodes/0.js": {
-    "file": "_app/immutable/nodes/0.Dcy9Fi1U.js",
+    "file": "_app/immutable/nodes/0.CJa3S-_s.js",
     "name": "nodes/0",
     "src": ".svelte-kit/generated/client-optimized/nodes/0.js",
     "isEntry": true,
@@ -35,7 +35,7 @@
       "_BjG7IeGY.js"
     ],
     "css": [
-      "_app/immutable/assets/0.r9Bp2uoj.css"
+      "_app/immutable/assets/0.DgaiNrJH.css"
     ],
     "assets": [
       "_app/immutable/assets/sora-latin-ext-200-normal.Ca0HaKqo.woff2",
@@ -77,7 +77,7 @@
     ]
   },
   ".svelte-kit/generated/client-optimized/nodes/1.js": {
-    "file": "_app/immutable/nodes/1.CVfRlpGj.js",
+    "file": "_app/immutable/nodes/1.OzGvm9KX.js",
     "name": "nodes/1",
     "src": ".svelte-kit/generated/client-optimized/nodes/1.js",
     "isEntry": true,
@@ -86,11 +86,11 @@
       "_Ht8u9NwZ.js",
       "_D9kjXApO.js",
       "_DEX5dTO8.js",
-      "_CMQCrboh.js"
+      "_CJwyWDj-.js"
     ]
   },
   ".svelte-kit/generated/client-optimized/nodes/2.js": {
-    "file": "_app/immutable/nodes/2.C08jpuSm.js",
+    "file": "_app/immutable/nodes/2.BygfqyvJ.js",
     "name": "nodes/2",
     "src": ".svelte-kit/generated/client-optimized/nodes/2.js",
     "isEntry": true,
@@ -113,11 +113,11 @@
       "node_modules/@tauri-apps/api/event.js"
     ],
     "css": [
-      "_app/immutable/assets/2.vLU5CsmJ.css"
+      "_app/immutable/assets/2.u6d-Np6k.css"
     ]
   },
   ".svelte-kit/generated/client-optimized/nodes/3.js": {
-    "file": "_app/immutable/nodes/3.DQXH5jhm.js",
+    "file": "_app/immutable/nodes/3.DA_QZ9X1.js",
     "name": "nodes/3",
     "src": ".svelte-kit/generated/client-optimized/nodes/3.js",
     "isEntry": true,
@@ -139,7 +139,7 @@
       "node_modules/@tauri-apps/api/core.js"
     ],
     "css": [
-      "_app/immutable/assets/3.B7UF4k6a.css"
+      "_app/immutable/assets/3.7DXwz1Mu.css"
     ]
   },
   ".svelte-kit/generated/client-optimized/nodes/4.js": {
@@ -195,8 +195,8 @@
       "_D9kjXApO.js"
     ]
   },
-  "_CMQCrboh.js": {
-    "file": "_app/immutable/chunks/CMQCrboh.js",
+  "_CJwyWDj-.js": {
+    "file": "_app/immutable/chunks/CJwyWDj-.js",
     "name": "state.svelte",
     "imports": [
       "_1kaZJbFx.js",
@@ -410,13 +410,13 @@
     "src": "node_modules/@fontsource/sora/files/sora-latin-ext-600-normal.woff2"
   },
   "node_modules/@sveltejs/kit/src/runtime/client/entry.js": {
-    "file": "_app/immutable/entry/start.BzsNzu4w.js",
+    "file": "_app/immutable/entry/start.1rltjVr4.js",
     "name": "entry/start",
     "src": "node_modules/@sveltejs/kit/src/runtime/client/entry.js",
     "isEntry": true,
     "imports": [
       "_D9kjXApO.js",
-      "_CMQCrboh.js"
+      "_CJwyWDj-.js"
     ]
   },
   "node_modules/@tauri-apps/api/core.js": {

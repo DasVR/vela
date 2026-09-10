@@ -379,6 +379,11 @@ pub fn run() {
 
             // chrome strip webview, pinned to the top 92px
             let strip = tauri::webview::WebviewBuilder::new("strip", tabs::strip_url(app.handle()));
+
+            #[cfg(target_os = "macos")]
+            let strip = strip.transparent(true);
+
+            let strip = strip;
             let (w, _h) = tabs::content_size(&window);
             window.add_child(
                 strip,

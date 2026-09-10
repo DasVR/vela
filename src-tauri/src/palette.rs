@@ -28,8 +28,12 @@ fn ensure_palette(app: &AppHandle) -> tauri::Result<tauri::WebviewWindow> {
         .resizable(false)
         .visible(false)
         .always_on_top(true)
-        .skip_taskbar(true)
-        .build()?;
+        .skip_taskbar(true);
+
+    #[cfg(target_os = "macos")]
+    let win = win.transparent(true).title_bar_style(tauri::TitleBarStyle::Overlay);
+
+    let win = win.build()?;
 
     // click-away / focus-loss closes it
     let app2 = app.clone();

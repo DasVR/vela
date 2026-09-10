@@ -68,6 +68,23 @@
     color: var(--ink);
     box-shadow: inset 0 2px 0 var(--accent);
   }
+  /* macOS: active tab = glass capsule with specular edge */
+  :global(html[data-platform='macos']) .tab.active {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(26px) saturate(1.7);
+    -webkit-backdrop-filter: blur(26px) saturate(1.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.65),
+      inset 0 2px 0 var(--accent),
+      0 2px 12px rgba(20, 32, 43, 0.06);
+  }
+  :global(html[data-theme='dark'][data-platform='macos']) .tab.active {
+    background: rgba(22, 33, 43, 0.48);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 2px 0 var(--accent),
+      0 2px 12px rgba(0, 0, 0, 0.35);
+  }
   .tab.crashed .t { color: var(--warn); }
 
   .tile {

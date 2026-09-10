@@ -35,6 +35,27 @@ jobs:
       - name: Build Vela (dmg + app)
         run: ui/node_modules/.bin/tauri build --target aarch64-apple-darwin --features macos-glass
 
+      - name: Smoke-test + screenshot the app (glass verification)
+        run: |
+          APP="src-tauri/target/aarch64-apple-darwin/release/bundle/macos/Vela.app"
+          open "$APP"
+          sleep 12
+          screencapture -x /tmp/vela-light.png
+          # toggle dark mode and re-capture
+          osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to true'
+          sleep 3
+          screencapture -x /tmp/vela-dark.png
+          killall vela 2>/dev/null || true
+          echo "captured:"
+          ls -la /tmp/vela-*.png
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vela-macos-screenshots
+          path: /tmp/vela-*.png
+          if-no-files-found: error
+
       - name: Upload .app (zipped)
         uses: actions/upload-artifact@v4
         with:

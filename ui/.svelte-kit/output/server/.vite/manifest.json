@@ -239,7 +239,7 @@
     "src": "src/routes/+layout.svelte",
     "isEntry": true,
     "css": [
-      "_app/immutable/assets/_layout.r9Bp2uoj.css"
+      "_app/immutable/assets/_layout.D0woavbj.css"
     ],
     "assets": [
       "_app/immutable/assets/sora-latin-ext-200-normal.Ca0HaKqo.woff2",
@@ -296,7 +296,7 @@
       "_sites.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.cc5lCvUL.css"
+      "_app/immutable/assets/_page.7tXZtSS0.css"
     ]
   },
   "src/routes/palette/+page.svelte": {
@@ -308,7 +308,7 @@
       "_index.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.B7UF4k6a.css"
+      "_app/immutable/assets/_page.7DXwz1Mu.css"
     ]
   },
   "src/routes/palette/+page.ts": {
