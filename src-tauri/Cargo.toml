@@ -1,0 +1,39 @@
+[package]
+name = "vela"
+version = "0.1.0"
+description = "A small, fast, personal browser"
+authors = ["das"]
+license = "MIT"
+edition = "2021"
+
+[lib]
+name = "vela_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[features]
+default = []
+# what `tauri build` enables: serves frontendDist via the custom protocol
+production = ["tauri/custom-protocol"]
+# macOS liquid-glass chrome (transparent window + overlay titlebar).
+# requires the tauri CLI env, so it's opt-in — the macOS CI enables it.
+macos-glass = ["tauri/macos-private-api"]
+
+[dependencies]
+tauri = { version = "2", features = ["unstable"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.32", features = ["bundled"] }
+parking_lot = "0.12"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+window-vibrancy = "0.8"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+strip = true
+panic = "abort"

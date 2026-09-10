@@ -1,0 +1,94 @@
+@import '@fontsource/sora/200.css';
+@import '@fontsource/sora/300.css';
+@import '@fontsource/sora/400.css';
+@import '@fontsource/sora/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+:root {
+  --page: #e9eef2;
+  --strip: #f8fafc;
+  --raised: #ffffff;
+  --ink: #14202b;
+  --ink-soft: #51606d;
+  --hairline: #d8e0e7;
+  --accent: #0e8f8b;
+  --accent-soft: rgba(14, 143, 139, 0.14);
+  --warn: #e85d4a;
+  --shadow: 0 8px 28px rgba(20, 32, 43, 0.12);
+  --radius: 10px;
+  --platform-macos: 0;
+}
+
+/* macOS: the strip floats over real liquid glass — translucent, blur */
+html[data-platform='macos'] {
+  --platform-macos: 1;
+  --strip: rgba(248, 250, 252, 0.55);
+  --raised: rgba(255, 255, 255, 0.72);
+  --shadow: 0 8px 28px rgba(20, 32, 43, 0.08);
+}
+
+html[data-platform='macos'] .strip {
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+}
+
+/* macOS overlay titlebar: leave room for the traffic lights (left ~78px) */
+html[data-platform='macos'] .rail {
+  padding-left: 82px;
+}
+
+:root[data-theme='dark'] {
+  --page: #0b1218;
+  --strip: #0e161d;
+  --raised: #16212b;
+  --ink: #dfe9f0;
+  --ink-soft: #8496a5;
+  --hairline: #22303c;
+  --accent: #2fc5bf;
+  --accent-soft: rgba(47, 197, 191, 0.16);
+  --warn: #ff7a66;
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: 'Sora', system-ui, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

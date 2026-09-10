@@ -1,0 +1,12 @@
+# build artifacts
+ui/build/
+ui/node_modules/
+src-tauri/target/
+src-tauri/gen/
+*.log
+
+# runtime
+*.db
+
+# os
+.DS_Store
