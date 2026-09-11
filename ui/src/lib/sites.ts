@@ -58,19 +58,23 @@ export function faviconFor(url: string): string | undefined {
 export interface Engine {
   id: string;
   name: string;
+  /** Short label for the omnibox / start-page engine chip */
+  short: string;
+  /** Brand color for the engine chip dot */
+  dot: string;
   /** %s is replaced with the URL-encoded query */
   pattern: string;
 }
 
 export const ENGINES: Engine[] = [
-  { id: 'duckduckgo', name: 'DuckDuckGo', pattern: 'https://duckduckgo.com/?q=%s' },
-  { id: 'google', name: 'Google', pattern: 'https://www.google.com/search?q=%s' },
-  { id: 'bing', name: 'Bing', pattern: 'https://www.bing.com/search?q=%s' },
-  { id: 'brave', name: 'Brave', pattern: 'https://search.brave.com/search?q=%s' },
-  { id: 'startpage', name: 'Startpage', pattern: 'https://www.startpage.com/sp/search?query=%s' },
-  { id: 'ecosia', name: 'Ecosia', pattern: 'https://www.ecosia.org/search?q=%s' },
-  { id: 'mojeek', name: 'Mojeek', pattern: 'https://www.mojeek.com/search?q=%s' },
-  { id: 'searx', name: 'SearX', pattern: 'https://searx.be/search?q=%s' }
+  { id: 'duckduckgo', name: 'DuckDuckGo', short: 'DDG', dot: '#de5833', pattern: 'https://duckduckgo.com/?q=%s' },
+  { id: 'google', name: 'Google', short: 'G', dot: '#4285f4', pattern: 'https://www.google.com/search?q=%s' },
+  { id: 'bing', name: 'Bing', short: 'B', dot: '#0f8f8f', pattern: 'https://www.bing.com/search?q=%s' },
+  { id: 'brave', name: 'Brave', short: 'BR', dot: '#fb542b', pattern: 'https://search.brave.com/search?q=%s' },
+  { id: 'startpage', name: 'Startpage', short: 'SP', dot: '#627ee7', pattern: 'https://www.startpage.com/sp/search?query=%s' },
+  { id: 'ecosia', name: 'Ecosia', short: 'EC', dot: '#59a86f', pattern: 'https://www.ecosia.org/search?q=%s' },
+  { id: 'mojeek', name: 'Mojeek', short: 'MJ', dot: '#c63351', pattern: 'https://www.mojeek.com/search?q=%s' },
+  { id: 'searx', name: 'SearX', short: 'SX', dot: '#2f8f6f', pattern: 'https://searx.be/search?q=%s' }
 ];
 
 export const DEFAULT_ENGINE = 'duckduckgo';

@@ -131,6 +131,42 @@ button {
   outline-offset: 1px;
 }
 
+/* tab title pulse while a page is loading */
+@keyframes vela-shimmer {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* strip bottom progress bar — driven by .loading / .done on .strip */
+.strip-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 8%;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  transition: width 1.2s ease, opacity 200ms ease;
+}
+.strip.loading .strip-progress {
+  width: 70%;
+  opacity: 1;
+}
+.strip.loading.done .strip-progress {
+  width: 100%;
+  opacity: 0;
+  transition: width 0s, opacity 200ms ease;
+}
+html[data-platform='macos'] .strip-progress {
+  background: color-mix(in srgb, var(--accent) 90%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

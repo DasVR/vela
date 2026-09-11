@@ -1,16 +1,22 @@
 <script lang="ts">
   import { browser, invokeSafe } from '$lib/browser.svelte';
   import { ENGINES, engineById } from '$lib/sites';
+  import Icon from '$lib/components/Icon.svelte';
 
   let draft = $state('');
   let focused = $state(false);
   let omnibox: HTMLInputElement | undefined = $state();
+  // the url the draft mirrors; submit only navigates when the draft was
+  // actually edited away from it (typed input), never re-submits a mirror
+  let mirrored = $state('');
 
   // mirror the active tab's url into the omnibox when not editing
   $effect(() => {
     if (focused) return;
     const a = browser.active;
-    draft = a && a.kind === 'page' ? a.url : '';
+    const url = a && a.kind === 'page' ? a.url : '';
+    mirrored = url;
+    draft = url;
   });
 
   window.addEventListener('vela:focus-omnibox', () => {
@@ -20,14 +26,22 @@
 
   function submit() {
     const a = browser.active;
-    if (!a || !draft.trim()) return;
-    browser.navigate(a.id, draft);
+    if (!a) return;
+    const input = draft.trim();
+    if (!input) return;
+    // unchanged mirror (user just pressed Enter on the copied url) = reload
+    // at most; do NOT treat it as a fresh query
+    if (input === mirrored && a.kind === 'page') {
+      browser.reload(a.id);
+      omnibox?.blur();
+      return;
+    }
+    browser.navigate(a.id, input);
     omnibox?.blur();
   }
 
   function escape() {
-    const a = browser.active;
-    draft = a && a.kind === 'page' ? a.url : '';
+    draft = mirrored;
     omnibox?.blur();
   }
 
@@ -40,10 +54,24 @@
     else w.close();
   }
 
+  function cycleEngine() {
+    const ids = ENGINES.map((e) => e.id);
+    const i = ids.indexOf(browser.session.engine);
+    browser.setEngine(ids[(i + 1) % ids.length]);
+  }
 
   const active = $derived(browser.active);
   const isStart = $derived(!active || active.kind === 'start');
-  const engineName = $derived(engineById(browser.session.engine).name);
+  const engine = $derived(engineById(browser.session.engine));
+  const status = $derived.by(() => {
+    if (!active || active.kind === 'start') {
+      return { name: 'search' as const, warn: false, title: undefined as string | undefined };
+    }
+    if (active.url.startsWith('http://')) {
+      return { name: 'lock' as const, warn: true, title: 'Not secure' };
+    }
+    return { name: 'lock' as const, warn: false, title: undefined };
+  });
 </script>
 
 <div class="bar">
@@ -53,25 +81,32 @@
     onclick={() => active && browser.back(active.id)}
     aria-label="Back"
     title="Back (Alt+←)"
-  >&#x25C0;</button>
+  ><Icon name="back" /></button>
   <button
     class="nav"
     disabled={isStart}
     onclick={() => active && browser.forward(active.id)}
     aria-label="Forward"
     title="Forward (Alt+→)"
-  >&#x25B6;</button>
+  ><Icon name="forward" /></button>
   <button
     class="nav"
     disabled={isStart}
     onclick={() => active && browser.reload(active.id)}
     aria-label="Reload"
     title="Reload"
-  >&#x27F3;</button>
+  ><Icon name="reload" /></button>
 
   <div class="omni" class:editing={focused}>
+    <span
+      class="status"
+      class:warn={status.warn}
+      title={status.title}
+    ><Icon name={status.name} size={18} /></span>
     {#if active && active.blocked > 0}
-      <span class="omni-shield mono" title="{active.blocked} requests blocked by the shield on this tab">&#x26E8;{active.blocked}</span>
+      <span class="omni-shield mono" title="{active.blocked} requests blocked by the shield on this tab">
+        <Icon name="shield" size={12} />{active.blocked}
+      </span>
     {/if}
     <input
       bind:this={omnibox}
@@ -85,6 +120,15 @@
         else if (e.key === 'Escape') escape();
       }}
     />
+    <button
+      type="button"
+      class="engine-chip mono"
+      onclick={cycleEngine}
+      title="Search engine: click to switch (currently {engine.name})"
+    >
+      <span class="dot" style="background:{engine.dot}"></span>
+      {engine.short}
+    </button>
   </div>
 
   <button
@@ -94,7 +138,7 @@
     onclick={() => browser.toggleBookmark()}
     aria-label="Bookmark this page"
     title="Bookmark"
-  >&#x2605;</button>
+  ><Icon name={browser.isBookmarked() ? 'starFill' : 'star'} /></button>
   <button
     class="nav"
     onclick={() => invokeSafe('open_palette')}
@@ -103,28 +147,18 @@
   ><span class="mono kbd">Ctrl K</span></button>
 
   <button
-    class="nav engine-btn"
-    onclick={() => {
-      const ids = ENGINES.map((e) => e.id);
-      const i = ids.indexOf(browser.session.engine);
-      browser.setEngine(ids[(i + 1) % ids.length]);
-    }}
-    title="Search engine: click to switch (currently {engineName})"
-  ><span class="mono kbd">{engineName}</span></button>
-
-  <button
     class="nav"
     onclick={() => browser.setTheme(browser.session.theme === 'dark' ? 'light' : 'dark')}
     aria-label="Toggle theme"
     title="Toggle light/dark"
-  >{browser.session.theme === 'dark' ? '&#x263C;' : '&#x263D;'}</button>
+  ><Icon name={browser.session.theme === 'dark' ? 'sun' : 'moon'} /></button>
 
   <span class="gap"></span>
 
   {#if document?.documentElement?.dataset?.platform !== 'macos'}
     <button class="nav" onclick={() => winCtl('minimize')} aria-label="Minimize">&#x2500;</button>
     <button class="nav" onclick={() => winCtl('toggleMaximize')} aria-label="Maximize">&#x25A1;</button>
-    <button class="nav close" onclick={() => winCtl('close')} aria-label="Close">&#x2715;</button>
+    <button class="nav close" onclick={() => winCtl('close')} aria-label="Close"><Icon name="close" /></button>
   {/if}
 </div>
 
@@ -139,8 +173,8 @@
 
   .nav {
     flex: none;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border: none;
     border-radius: 8px;
     background: transparent;
@@ -149,6 +183,7 @@
     display: grid;
     place-items: center;
     cursor: default;
+    transition: color 120ms ease, background 120ms ease;
   }
   .nav:hover:not(:disabled) { background: var(--raised); color: var(--ink); }
   .nav:disabled { opacity: 0.35; }
@@ -167,7 +202,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 0 14px;
+    padding: 0 8px 0 10px;
     border-radius: 17px;
     background: var(--raised);
     border: 1px solid var(--hairline);
@@ -189,6 +224,16 @@
     box-shadow: 0 0 0 3px var(--accent-soft);
   }
 
+  .status {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    display: grid;
+    place-items: center;
+    color: var(--ink-soft);
+  }
+  .status.warn { color: var(--warn); }
+
   .omni input {
     flex: 1;
     min-width: 0;
@@ -201,18 +246,47 @@
   }
   .omni input::placeholder { color: var(--ink-soft); }
 
-  .omni-shield { font-size: 10px; color: var(--warn); }
+  .omni-shield {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--warn);
+  }
+
+  .engine-chip {
+    flex: none;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 8px 0 6px;
+    border: none;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--page) 50%, transparent);
+    color: var(--ink-soft);
+    font-size: 10px;
+    cursor: default;
+  }
+  :global(html[data-platform='macos']) .engine-chip {
+    background: transparent;
+  }
+  .engine-chip:hover { color: var(--ink); }
+  .engine-chip .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex: none;
+  }
 
   .gap { flex: 1; }
 
   .close:hover { background: var(--warn); color: #fff; }
 
-  .engine-btn {
+  /* Ctrl+K is wider than icon buttons */
+  .nav:has(.kbd) {
     width: auto;
-    padding: 0 10px;
-    font-size: 11px;
-    color: var(--ink-soft);
-    white-space: nowrap;
+    padding: 0 8px;
   }
-  .engine-btn:hover { color: var(--ink); background: var(--raised); }
 </style>

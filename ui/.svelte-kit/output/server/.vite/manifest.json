@@ -10,6 +10,13 @@
       "_internal.js"
     ]
   },
+  "_Icon.js": {
+    "file": "chunks/Icon.js",
+    "name": "Icon",
+    "imports": [
+      "_index.js"
+    ]
+  },
   "_exports.js": {
     "file": "chunks/exports.js",
     "name": "exports"
@@ -36,10 +43,6 @@
   "_server.js": {
     "file": "chunks/server.js",
     "name": "server"
-  },
-  "_sites.js": {
-    "file": "chunks/sites.js",
-    "name": "sites"
   },
   "_utils.js": {
     "file": "chunks/utils.js",
@@ -239,7 +242,7 @@
     "src": "src/routes/+layout.svelte",
     "isEntry": true,
     "css": [
-      "_app/immutable/assets/_layout.BMZQZ8St.css"
+      "_app/immutable/assets/_layout.B60g65NZ.css"
     ],
     "assets": [
       "_app/immutable/assets/sora-latin-ext-200-normal.Ca0HaKqo.woff2",
@@ -293,10 +296,10 @@
     "isEntry": true,
     "imports": [
       "_index.js",
-      "_sites.js"
+      "_Icon.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.DfffK9dl.css"
+      "_app/immutable/assets/_page.oZc4EAqd.css"
     ]
   },
   "src/routes/palette/+page.svelte": {
@@ -324,10 +327,10 @@
     "isEntry": true,
     "imports": [
       "_index.js",
-      "_sites.js"
+      "_Icon.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.LH_YWN7S.css"
+      "_app/immutable/assets/_page.B-sP8Q54.css"
     ]
   },
   "src/routes/start/+page.ts": {

@@ -1,6 +1,6 @@
-import "clsx";
 import { a6 as ssr_context, a7 as ensure_array_like, a8 as attr_class, a9 as attr, aa as attr_style, ab as stringify, e as escape_html, a5 as derived } from "../../chunks/index.js";
-import { s as searchUrlFor, t as tileFor, e as engineById } from "../../chunks/sites.js";
+import "clsx";
+import { s as searchUrlFor, t as tileFor, I as Icon, e as engineById } from "../../chunks/Icon.js";
 function onDestroy(fn) {
   /** @type {SSRContext} */
   ssr_context.r.on_destroy(fn);
@@ -220,15 +220,21 @@ function TabRail($$renderer, $$props) {
       $$renderer2.push(`<button${attr_class("tab svelte-uvgx0j", void 0, {
         "active": tab.id === browser.activeId,
         "crashed": tab.crashed
-      })}${attr("title", tab.url)}><span class="tile mono svelte-uvgx0j"${attr_style(`background:${stringify(tileFor(tab.url).bg)};color:${stringify(tileFor(tab.url).fg)}`)}>${escape_html(tileFor(tab.url).label)}</span> <span class="t svelte-uvgx0j">${escape_html(tab.loading ? "Loading…" : tab.title)}</span> `);
+      })}${attr("title", tab.url)}><span class="tile mono svelte-uvgx0j"${attr_style(`background:${stringify(tileFor(tab.url).bg)};color:${stringify(tileFor(tab.url).fg)}`)}>${escape_html(tileFor(tab.url).label)}</span> <span${attr_class("t svelte-uvgx0j", void 0, { "loading": tab.loading })}>${escape_html(tab.title || "…")}</span> `);
       if (tab.blocked > 0) {
-        $$renderer2.push(`<!--[0--><span class="shield mono svelte-uvgx0j"${attr("title", `${stringify(tab.blocked)} blocked on this tab`)}>⛨${escape_html(tab.blocked)}</span>`);
+        $$renderer2.push(`<!--[0--><span class="shield mono svelte-uvgx0j"${attr("title", `${stringify(tab.blocked)} blocked on this tab`)}>`);
+        Icon($$renderer2, { name: "shield", size: 12 });
+        $$renderer2.push(`<!---->${escape_html(tab.blocked)}</span>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--> <span class="x svelte-uvgx0j" role="button" tabindex="-1" aria-label="Close tab">✕</span></button>`);
+      $$renderer2.push(`<!--]--> <span class="x svelte-uvgx0j" role="button" tabindex="-1" aria-label="Close tab">`);
+      Icon($$renderer2, { name: "close", size: 12 });
+      $$renderer2.push(`<!----></span></button>`);
     }
-    $$renderer2.push(`<!--]--> <button class="new svelte-uvgx0j" aria-label="New tab">+</button></div>`);
+    $$renderer2.push(`<!--]--> <button class="new svelte-uvgx0j" aria-label="New tab">`);
+    Icon($$renderer2, { name: "plus" });
+    $$renderer2.push(`<!----></button></div>`);
   });
 }
 function Toolbar($$renderer, $$props) {
@@ -239,16 +245,41 @@ function Toolbar($$renderer, $$props) {
     });
     const active = derived(() => browser.active);
     const isStart = derived(() => !active() || active().kind === "start");
-    const engineName = derived(() => engineById(browser.session.engine).name);
-    $$renderer2.push(`<div class="bar svelte-1ld6r3r"><button class="nav svelte-1ld6r3r"${attr("disabled", isStart(), true)} aria-label="Back" title="Back (Alt+←)">◀</button> <button class="nav svelte-1ld6r3r"${attr("disabled", isStart(), true)} aria-label="Forward" title="Forward (Alt+→)">▶</button> <button class="nav svelte-1ld6r3r"${attr("disabled", isStart(), true)} aria-label="Reload" title="Reload">⟳</button> <div${attr_class("omni svelte-1ld6r3r", void 0, { "editing": focused })}>`);
+    const engine = derived(() => engineById(browser.session.engine));
+    const status = derived(() => {
+      if (!active() || active().kind === "start") {
+        return { name: "search", warn: false, title: void 0 };
+      }
+      if (active().url.startsWith("http://")) {
+        return { name: "lock", warn: true, title: "Not secure" };
+      }
+      return { name: "lock", warn: false, title: void 0 };
+    });
+    $$renderer2.push(`<div class="bar svelte-1ld6r3r"><button class="nav svelte-1ld6r3r"${attr("disabled", isStart(), true)} aria-label="Back" title="Back (Alt+←)">`);
+    Icon($$renderer2, { name: "back" });
+    $$renderer2.push(`<!----></button> <button class="nav svelte-1ld6r3r"${attr("disabled", isStart(), true)} aria-label="Forward" title="Forward (Alt+→)">`);
+    Icon($$renderer2, { name: "forward" });
+    $$renderer2.push(`<!----></button> <button class="nav svelte-1ld6r3r"${attr("disabled", isStart(), true)} aria-label="Reload" title="Reload">`);
+    Icon($$renderer2, { name: "reload" });
+    $$renderer2.push(`<!----></button> <div${attr_class("omni svelte-1ld6r3r", void 0, { "editing": focused })}><span${attr_class("status svelte-1ld6r3r", void 0, { "warn": status().warn })}${attr("title", status().title)}>`);
+    Icon($$renderer2, { name: status().name, size: 18 });
+    $$renderer2.push(`<!----></span> `);
     if (active() && active().blocked > 0) {
-      $$renderer2.push(`<!--[0--><span class="omni-shield mono svelte-1ld6r3r"${attr("title", `${stringify(active().blocked)} requests blocked by the shield on this tab`)}>⛨${escape_html(active().blocked)}</span>`);
+      $$renderer2.push(`<!--[0--><span class="omni-shield mono svelte-1ld6r3r"${attr("title", `${stringify(active().blocked)} requests blocked by the shield on this tab`)}>`);
+      Icon($$renderer2, { name: "shield", size: 12 });
+      $$renderer2.push(`<!---->${escape_html(active().blocked)}</span>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <input${attr("value", draft)} placeholder="Search or enter address" spellcheck="false" class="svelte-1ld6r3r"/></div> <button${attr_class("nav star svelte-1ld6r3r", void 0, { "filled": browser.isBookmarked() })}${attr("disabled", isStart(), true)} aria-label="Bookmark this page" title="Bookmark">★</button> <button class="nav svelte-1ld6r3r" aria-label="Command palette" title="Command palette (Ctrl+K)"><span class="mono kbd svelte-1ld6r3r">Ctrl K</span></button> <button class="nav engine-btn svelte-1ld6r3r"${attr("title", `Search engine: click to switch (currently ${stringify(engineName())})`)}><span class="mono kbd svelte-1ld6r3r">${escape_html(engineName())}</span></button> <button class="nav svelte-1ld6r3r" aria-label="Toggle theme" title="Toggle light/dark">${escape_html(browser.session.theme === "dark" ? "&#x263C;" : "&#x263D;")}</button> <span class="gap svelte-1ld6r3r"></span> `);
+    $$renderer2.push(`<!--]--> <input${attr("value", draft)} placeholder="Search or enter address" spellcheck="false" class="svelte-1ld6r3r"/> <button type="button" class="engine-chip mono svelte-1ld6r3r"${attr("title", `Search engine: click to switch (currently ${stringify(engine().name)})`)}><span class="dot svelte-1ld6r3r"${attr_style(`background:${stringify(engine().dot)}`)}></span> ${escape_html(engine().short)}</button></div> <button${attr_class("nav star svelte-1ld6r3r", void 0, { "filled": browser.isBookmarked() })}${attr("disabled", isStart(), true)} aria-label="Bookmark this page" title="Bookmark">`);
+    Icon($$renderer2, { name: browser.isBookmarked() ? "starFill" : "star" });
+    $$renderer2.push(`<!----></button> <button class="nav svelte-1ld6r3r" aria-label="Command palette" title="Command palette (Ctrl+K)"><span class="mono kbd svelte-1ld6r3r">Ctrl K</span></button> <button class="nav svelte-1ld6r3r" aria-label="Toggle theme" title="Toggle light/dark">`);
+    Icon($$renderer2, { name: browser.session.theme === "dark" ? "sun" : "moon" });
+    $$renderer2.push(`<!----></button> <span class="gap svelte-1ld6r3r"></span> `);
     if (document?.documentElement?.dataset?.platform !== "macos") {
-      $$renderer2.push(`<!--[0--><button class="nav svelte-1ld6r3r" aria-label="Minimize">─</button> <button class="nav svelte-1ld6r3r" aria-label="Maximize">□</button> <button class="nav close svelte-1ld6r3r" aria-label="Close">✕</button>`);
+      $$renderer2.push(`<!--[0--><button class="nav svelte-1ld6r3r" aria-label="Minimize">─</button> <button class="nav svelte-1ld6r3r" aria-label="Maximize">□</button> <button class="nav close svelte-1ld6r3r" aria-label="Close">`);
+      Icon($$renderer2, { name: "close" });
+      $$renderer2.push(`<!----></button>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
@@ -285,11 +316,13 @@ function _page($$renderer, $$props) {
       unsubs.forEach((u) => u());
       window.removeEventListener("keydown", onKey);
     });
-    $$renderer2.push(`<div class="strip svelte-1uha8ag" data-tauri-drag-region="">`);
+    let stripLoading = false;
+    let stripDone = false;
+    $$renderer2.push(`<div${attr_class("strip svelte-1uha8ag", void 0, { "loading": stripLoading, "done": stripDone })} data-tauri-drag-region="">`);
     TabRail($$renderer2);
     $$renderer2.push(`<!----> `);
     Toolbar($$renderer2);
-    $$renderer2.push(`<!----></div>`);
+    $$renderer2.push(`<!----> <div class="strip-progress" aria-hidden="true"></div></div>`);
   });
 }
 export {

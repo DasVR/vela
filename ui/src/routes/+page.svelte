@@ -61,15 +61,41 @@
   $effect(() => {
     document.documentElement.dataset.theme = browser.session.theme;
   });
+
+  // strip progress bar: .loading while any tab loads; brief .done to snap→fade
+  const anyLoading = $derived(browser.tabs.some((t) => t.loading));
+  let stripLoading = $state(false);
+  let stripDone = $state(false);
+  $effect(() => {
+    if (anyLoading) {
+      stripLoading = true;
+      stripDone = false;
+      return;
+    }
+    if (!stripLoading) return;
+    stripDone = true;
+    const t = setTimeout(() => {
+      stripLoading = false;
+      stripDone = false;
+    }, 200);
+    return () => clearTimeout(t);
+  });
 </script>
 
-<div class="strip" data-tauri-drag-region>
+<div
+  class="strip"
+  class:loading={stripLoading}
+  class:done={stripDone}
+  data-tauri-drag-region
+>
   <TabRail />
   <Toolbar />
+  <div class="strip-progress" aria-hidden="true"></div>
 </div>
 
 <style>
   .strip {
+    position: relative;
     height: 92px;
     display: flex;
     flex-direction: column;
